@@ -13,6 +13,16 @@
 
     console.log('GitMash loaded');
 
+    // Add custom CSS to style the buttons and summary element
+    const style = document.createElement('style');
+    style.textContent = `
+        .merge-box-button,
+        .select-menu-button {
+            background-color: #6A0DAD !important; /* Purple */
+        }
+    `;
+    document.head.appendChild(style);
+
     // Handle the SPA nature of github, listen for navigation changes and act on those.
     window.navigation.addEventListener("navigate", (event) => {
         if (event.navigationType === 'replace') {
