@@ -16,8 +16,8 @@
     // Add custom CSS to style the buttons and summary element
     const style = document.createElement('style');
     style.textContent = `
-        .merge-box-button,
-        .select-menu-button {
+        .merge-box-button:enabled,
+        .js-merge-method-menu-button {
             background-color: #6A0DAD !important; /* Purple */
         }
     `;
