@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name         GitHub Mash
-// @version      0.0.1
+// @version      0.2.8
 // @description  Set your PR default GitHub Merge or Squash button based on where you are merging into
+// WIP updating the commit title
 // @match https://github.com/*
 // @license MIT
 // @author robf-github
@@ -29,6 +30,35 @@
       gitMash();
     }
   });
+
+  // Add event listeners to buttons with the specified classes
+  document.addEventListener('click', function (event) {
+    if (
+      event.target.closest(
+        'button.btn-group-squash, button.btn-group-merge, button.btn-group-rebase'
+      )
+    ) {
+      const issueTitle = document.querySelector('#issue_title').value;
+      const mergeTitleField = document.querySelector('#merge_title_field');
+      if (mergeTitleField) {
+        mergeTitleField.value = issueTitle;
+        console.log('Merge title field updated with ' + issueTitle);
+      }
+    }
+  });
+
+  // Mutation observer to check and click cancel button if expanded
+  const observer = new MutationObserver(function (mutations, observer) {
+    const cancelButton = document.querySelector('button.js-details-target.btn');
+    if (cancelButton && cancelButton.getAttribute('aria-expanded') === 'true') {
+      cancelButton.click();
+      console.log('Cancel button clicked due to aria-expanded being true.');
+      observer.disconnect(); // Stop observing once the button is clicked
+    }
+  });
+
+  // Start observing the document for changes
+  observer.observe(document, { childList: true, subtree: true });
 })();
 
 let observer;
@@ -87,6 +117,5 @@ function gitMash() {
 }
 
 function selectGitMash(element) {
-  element.click();
   console.log(element.textContent + ' selected!');
 }

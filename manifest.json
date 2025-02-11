@@ -1,16 +1,12 @@
 {
-    "manifest_version": 3,
-    "name": "GitHub Mash",
-    "description": "Set your PR default GitHub Merge or Squash button based on where you are merging into",
-    "version": "1.0",
-    "content_scripts": [
-      {
-        "js": [
-          "github-mash.js"
-        ],
-        "matches": [
-          "https://github.com/*"
-        ]
-      }
-    ]
-  }
+  "manifest_version": 3,
+  "name": "GitHub Mash",
+  "description": "Set your PR default GitHub Merge or Squash button based on where you are merging into",
+  "version": "0.2.8",
+  "content_scripts": [
+    {
+      "js": ["github-mash.js"],
+      "matches": ["https://github.com/*"]
+    }
+  ]
+}
