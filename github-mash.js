@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Mash
-// @version      0.2.8
+// @version      0.2.26
 // @description  Set your PR default GitHub Merge or Squash button based on where you are merging into
 // WIP updating the commit title
 // @match https://github.com/*
@@ -46,19 +46,6 @@
       }
     }
   });
-
-  // Mutation observer to check and click cancel button if expanded
-  const observer = new MutationObserver(function (mutations, observer) {
-    const cancelButton = document.querySelector('button.js-details-target.btn');
-    if (cancelButton && cancelButton.getAttribute('aria-expanded') === 'true') {
-      cancelButton.click();
-      console.log('Cancel button clicked due to aria-expanded being true.');
-      observer.disconnect(); // Stop observing once the button is clicked
-    }
-  });
-
-  // Start observing the document for changes
-  observer.observe(document, { childList: true, subtree: true });
 })();
 
 let observer;
@@ -117,5 +104,6 @@ function gitMash() {
 }
 
 function selectGitMash(element) {
-  console.log(element.textContent + ' selected!');
+  element.click();
+  console.log(element.value + ' selected!');
 }
