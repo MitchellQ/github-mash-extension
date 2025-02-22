@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Mash
-// @version      0.2.26
+// @version      1.0.0
 // @description  Set your PR default GitHub Merge or Squash button based on where you are merging into
 // WIP updating the commit title
 // @match https://github.com/*
@@ -17,8 +17,8 @@
   // Add custom CSS to style the buttons and summary element
   const style = document.createElement('style');
   style.textContent = `
-        .merge-box-button:enabled,
-        .js-merge-method-menu-button {
+        [aria-label="Select merge method"],
+        button[data-variant="primary"][data-size="medium"] {
             background-color: #6A0DAD !important; /* Purple */
         }
     `;
@@ -30,28 +30,14 @@
       gitMash();
     }
   });
-
-  // Add event listeners to buttons with the specified classes
-  document.addEventListener('click', function (event) {
-    if (
-      event.target.closest(
-        'button.btn-group-squash, button.btn-group-merge, button.btn-group-rebase'
-      )
-    ) {
-      const issueTitle = document.querySelector('#issue_title').value;
-      const mergeTitleField = document.querySelector('#merge_title_field');
-      if (mergeTitleField) {
-        mergeTitleField.value = issueTitle;
-        console.log('Merge title field updated with ' + issueTitle);
-      }
-    }
-  });
 })();
 
 let observer;
+const baseBranch = document.querySelector('.base-ref').textContent;
+const headBranch = document.querySelector('.head-ref').textContent;
 
 function gitMash() {
-  console.log('0.2.8');
+  console.log('1.2.6');
   if (observer) {
     observer.disconnect();
     observer = undefined;
@@ -61,49 +47,66 @@ function gitMash() {
   if (window.location.href.match('https://github.com/.*?/pull/.*') == null) {
     return;
   }
-
-  console.log(window.location.href);
-
-  const developBranch = 'develop';
-  const featureBranchPrefix = 'feature/';
-
-  const baseBranch = document.querySelector('.base-ref').textContent;
-  const headBranch = document.querySelector('.head-ref').textContent;
+  console.log(`Current URL: ${window.location.href}`);
 
   if (!baseBranch || !headBranch) {
+    console.warn('Base or head branch not found.');
     return;
   }
 
-  let selector;
-  if (
-    baseBranch === developBranch &&
-    headBranch.startsWith(featureBranchPrefix)
-  ) {
-    selector = '.js-merge-box-button-squash';
+  const dropdownSelector = '[aria-label="Select merge method"]';
+  const dropdownBtn = document.querySelector(dropdownSelector);
+  if (dropdownBtn) {
+    openDropDown(dropdownBtn);
   } else {
-    selector = '.js-merge-box-button-merge';
-  }
-
-  let element = document.querySelector(selector);
-
-  if (element) {
-    selectGitMash(element);
-  } else {
-    observer = new MutationObserver((_) => {
-      let element = document.querySelector(selector);
-      if (element) {
-        observer.disconnect();
-        observer = undefined;
-        selectGitMash(element);
-        console.log('GitMash not listening...');
-      }
-    });
-    console.log('GitMash listening...');
-    observer.observe(document.body, { childList: true, subtree: true });
+    observeForElement(dropdownSelector, openDropDown);
   }
 }
 
-function selectGitMash(element) {
+function openDropDown(element) {
   element.click();
-  console.log(element.value + ' selected!');
+  console.log('Dropdown button clicked.');
+
+  const itemsSelector = '[data-component="ActionList.Item--DividerContainer"]';
+  const items = document.querySelectorAll(itemsSelector);
+  if (items.length > 1) {
+    selectGitMash(items);
+  } else {
+    observeForElement(itemsSelector, selectGitMash, true);
+  }
+}
+
+function selectGitMash(elements) {
+  const DEVELOP_BRANCH = 'develop';
+  const FEATURE_PREFIX = 'feature/';
+
+  let selectionIndex =
+    baseBranch === DEVELOP_BRANCH && headBranch.startsWith(FEATURE_PREFIX)
+      ? 1
+      : 0;
+  let method = selectionIndex === 1 ? 'squash' : 'merge';
+
+  console.log(`Selecting merge method: ${method}`);
+  const selectedElement = elements[selectionIndex];
+  if (selectedElement) {
+    console.log('Clicking merge option...');
+    selectedElement.click();
+  }
+}
+
+function observeForElement(selector, callback, selectAll = false) {
+  observer = new MutationObserver(() => {
+    const elements = selectAll
+      ? document.querySelectorAll(selector)
+      : document.querySelector(selector);
+
+    if (selectAll ? elements.length > 0 : elements) {
+      observer.disconnect();
+      observer = null;
+      callback(elements);
+      console.log(`GitMash stopped listening for ${selector}`);
+    }
+  });
+  console.log(`GitMash listening for ${selector}...`);
+  observer.observe(document.body, { childList: true, subtree: true });
 }
