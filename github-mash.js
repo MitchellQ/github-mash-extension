@@ -14,7 +14,7 @@ let headBranch;
 let isFeatureMerge;
 
 const isDebug = false;
-const version = '1.4.8';
+const changeBtnColour = true;
 const DEVELOP_BRANCH = 'develop';
 const FEATURE_PREFIX = 'feature/';
 
@@ -39,7 +39,9 @@ function gitMash() {
   }
   console.log(`Current URL: ${window.location.href}`);
 
-  styleMergeButton();
+  if (changeBtnColour) {
+    styleMergeButton();
+  }
 
   baseBranch = document.querySelector('.base-ref').textContent;
   headBranch = document.querySelector('.head-ref').textContent;
@@ -67,7 +69,7 @@ function styleMergeButton() {
   // Add custom CSS to style the buttons and summary element
   const style = document.createElement('style');
   style.textContent = `
-        [aria-label="Select merge method"],
+        [aria-label="Select merge method"]:enabled,
         button.prc-Button-ButtonBase-c50BI[data-variant="primary"] {
             background-color: #6A0DAD !important; /* Purple */
         }
@@ -93,6 +95,10 @@ function selectGitMash(elements) {
 
   console.log(`Selecting merge method: ${method}`);
   elements[selectionIndex]?.click();
+
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+  }, 100);
 }
 
 function mergeBtnListener(btn) {
