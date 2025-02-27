@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Mash
-// @version      1.4.8
+// @version      1.5.6
 // @description  Set your PR default GitHub Merge or Squash button based on where you are merging into
 // and update the commit message title (when merging from feature/* into develop) if needed.
 // @match https://github.com/*
@@ -15,6 +15,7 @@ let isFeatureMerge;
 
 const isDebug = false;
 const changeBtnColour = true;
+const version = '1.5.6';
 const DEVELOP_BRANCH = 'develop';
 const FEATURE_PREFIX = 'feature/';
 
