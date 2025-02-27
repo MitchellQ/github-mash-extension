@@ -13,7 +13,7 @@ let baseBranch;
 let headBranch;
 let isFeatureMerge;
 
-const isDebug = true;
+const isDebug = false;
 const changeBtnColour = true;
 const showCustomAlert = true;
 const version = '2.1.8';
