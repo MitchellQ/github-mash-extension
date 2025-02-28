@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Mash
-// @version      2.2.6
+// @version      2.2.7
 // @description  Set your PR default GitHub Merge or Squash button based on where you are merging into
 // and update the commit message title (when merging from feature/* into develop) if needed.
 // @match https://github.com/*
@@ -17,7 +17,7 @@ let isGitMashRunning = false;
 const isDebug = true;
 const changeBtnColour = true;
 const showCustomAlert = true;
-const version = '2.2.6';
+const version = '2.2.7';
 const DEVELOP_BRANCH = 'develop';
 const FEATURE_PREFIX = 'feature/';
 const btnSelector =
@@ -151,6 +151,11 @@ function showAlert(message) {
   console.log('here');
   styleAlert();
 
+  // Create the overlay element
+  const overlay = document.createElement('div');
+  overlay.className = 'gitmash-overlay';
+  document.body.appendChild(overlay);
+
   // Create a div for the custom alert
   const alertDiv = document.createElement('div');
   alertDiv.className = 'custom-alert rounded-bottom-2';
@@ -168,19 +173,34 @@ function showAlert(message) {
   // Add click event to close the alert
   closeButton.addEventListener('click', () => {
     alertDiv.remove();
+    overlay.remove();
   });
 
   // Append the close button to the alert
   alertDiv.appendChild(closeButton);
 
-  // Append the alert div to the body
+  // Append the alert div and overlay to the body
   document.body.appendChild(alertDiv);
+
+  // Show the overlay and alert
+  overlay.style.display = 'block';
 }
 
 // Function to add styles for the alert and close button
 function styleAlert() {
   const style = document.createElement('style');
   style.textContent = `
+    .gitmash-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9998; /* Lower z-index than the alert */
+      display: none; /* Hidden by default */
+    }
+
     .custom-alert {
       position: fixed;
       top: 50%;
