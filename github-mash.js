@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Mash
-// @version      2.1.8
+// @version      2.2.6
 // @description  Set your PR default GitHub Merge or Squash button based on where you are merging into
 // and update the commit message title (when merging from feature/* into develop) if needed.
 // @match https://github.com/*
@@ -12,11 +12,12 @@ let observer;
 let baseBranch;
 let headBranch;
 let isFeatureMerge;
+let isGitMashRunning = false;
 
-const isDebug = false;
+const isDebug = true;
 const changeBtnColour = true;
 const showCustomAlert = true;
-const version = '2.1.8';
+const version = '2.2.6';
 const DEVELOP_BRANCH = 'develop';
 const FEATURE_PREFIX = 'feature/';
 const btnSelector =
@@ -28,17 +29,40 @@ const btnSelector =
 
   // Handle the SPA nature of github, listen for navigation changes and act on those.
   window.navigation.addEventListener('navigate', (event) => {
-    if (event.navigationType === 'replace') {
+    if (
+      event.navigationType === 'replace' /*||
+      event.navigationType === 'traverse'*/
+    ) {
+      isDebug ? console.log('Calling GitMash') : '';
       gitMash();
+    } else {
+      isDebug ? console.log(`event ${event.navigationType}`) : '';
     }
   });
 })();
 
 function gitMash() {
+  // Static variable to check if gitMash is already running
+  if (typeof gitMash.isRunning === 'undefined') {
+    isDebug
+      ? console.log('GitMash.isRunning is undefined setting to false')
+      : '';
+    gitMash.isRunning = false;
+  }
+
+  if (gitMash.isRunning) {
+    console.log('GitMash: Already running, skipping initialization.');
+    return;
+  }
+
+  isDebug ? console.log('Setting the GitMash.isRunning to true') : '';
+  gitMash.isRunning = true;
+
   if (window.location.href.match('https://github.com/.*?/pull/.*') == null) {
     console.log(
       'GitMash: Not on a Pull Request page, skipping initialization.'
     );
+    gitMash.isRunning = false;
     return;
   }
   console.log(`Current URL: ${window.location.href}`);
@@ -60,6 +84,11 @@ function gitMash() {
     addWarningBox,
     'add warning box'
   );
+
+  setTimeout(() => {
+    isDebug ? console.log('Setting the GitMash.isRunning back to false') : '';
+    gitMash.isRunning = false;
+  }, 2000);
 }
 
 function addWarningBox(element) {
