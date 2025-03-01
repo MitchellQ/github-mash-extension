@@ -12,9 +12,8 @@ let observer;
 let baseBranch;
 let headBranch;
 let isFeatureMerge;
-let isGitMashRunning = false;
 
-const isDebug = true;
+const isDebug = false;
 const changeBtnColour = true;
 const showCustomAlert = true;
 const version = '2.2.7';
